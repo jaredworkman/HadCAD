@@ -42,3 +42,9 @@ export default {
 	}
 }
 </script>
+
+<style>
+card {
+	border-left: 9px solid #607D8B;
+}
+</style>

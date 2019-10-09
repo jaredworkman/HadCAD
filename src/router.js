@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/views/Login'
-import People from '@/components/People'
 import Projects from '@/views/Projects'
 import Profile from '@/views/Profile'
 import Client from '@/views/Client'
@@ -49,11 +48,6 @@ export default new Router({
       path: '/dashboard',
       name: 'Dashboard',
       component: Dashboard
-    },
-    {
-      path: '/team',
-      name: 'Team',
-      component: People
     },
   ]
 })

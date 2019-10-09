@@ -1,6 +1,7 @@
 <template>
 <div>
 	<Project />
+
 </div>
 </template>
 
@@ -16,6 +17,10 @@ export default {
 		}
 	},
 	methods: {
+		next () {
+			const active = parseInt(this.active);
+			this.active = (active < 2 ? active + 1 : 0);
+		},
 		addTimeRecord(links){
 			const uuidv4 = require('uuid/v4');
 			const id = uuidv4();

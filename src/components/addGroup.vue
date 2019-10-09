@@ -1,5 +1,5 @@
 <template>
-	<v-dialog max-width='600px' transition='dialog-transition' v-model='dialog' lazy>
+	<v-dialog max-width='600px' transition='dialog-transition' v-model='dialog'>
 		<v-btn small flat slot='activator' class='tertiary--text'>
 			<v-icon>add</v-icon>
 			<span>Group</span>
@@ -10,7 +10,7 @@
 			</v-card-title>
 			<v-card-text>
 				<v-form class='px-3' ref='form'>
-					<v-text-field label='Name' autofocus v-model='name' prepend-icon='person'></v-text-field>
+					<v-text-field label='Name' v-model='name' prepend-icon='person'></v-text-field>
 					<v-combobox
 						label='Invite group members'
 						v-model='members'
@@ -63,30 +63,27 @@ export default {
 	},
 	methods: {
 		async submit() {
-			this.loading = true;
 			const uuidv4 = require('uuid/v4');
 			const id = uuidv4();
 			const projects = [];
 			const owners = this.owners;
 			owners.push(this.user.id);
 			const members = this.members;
-			for (let i = 0; i < owners.length; i++) {
-				members.push(owners[i]);
-			}
 			const name = this.name
 			const group = await createGroup(id, name, owners, projects, members);
 			this.$store.commit('createGroup', group);
-			// Update members
 			members.forEach(member => {
 				updateUserGroup(member, id);
 			});
-			owners.forEach(owner => {
-				updateUserGroup(owner, id);
-			});
-			this.loading = false;
-			this.$refs.form.reset();
-			this.dialog = false;
-			this.$emit('groupAdded');
+			this.loading = true;
+			this.user.groups.push(id);
+			//update each member of the group
+			updateUser(this.user);
+			setTimeout(() => {
+				this.loading = false;
+				this.dialog = false;
+				this.$emit('memberAdded');
+			}, 1000)
 		}
 	}
 }

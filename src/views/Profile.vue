@@ -69,8 +69,6 @@
 							<div slot='header' class='tertiary--text headline'>Settings</div>
 							<v-divider></v-divider>
 							<v-card-text>
-								Color: {{ color }}
-								<input type='color' v-model='color' @change='setColor' />
 								<!-- Section -->
 								<v-layout>
 									<v-flex class='text-sm-left'>
@@ -78,7 +76,7 @@
 									</v-flex>
 									<v-flex>
 										<v-text-field label='Username' v-model='title' solo></v-text-field>
-										<v-text-field label='Email' v-model='email' solo></v-text-field>
+										<v-text-field label='Email' v-model='Email' solo></v-text-field>
 									</v-flex>
 								</v-layout>
 								<v-divider></v-divider>
@@ -89,7 +87,7 @@
 										<h2 class='subheading font-weight-light'>Billing</h2>
 									</v-flex>
 									<v-flex>
-										<v-text-field label='Name' v-model='creditName' solo></v-text-field>
+										<v-text-field label='Title' v-model='title' solo></v-text-field>
 										<v-text-field label='Credit Card' v-model='CreditCard' solo></v-text-field>
 									</v-flex>
 								</v-layout>
@@ -101,8 +99,8 @@
 										<h2 class='subheading font-weight-light'>Password</h2>
 									</v-flex>
 									<v-flex>
-										<v-text-field label='Old Password' v-model='originalPassword' solo></v-text-field>
-										<v-text-field label='New Password' v-model='newPassword' solo></v-text-field>
+										<v-text-field label='Old Password' v-model='title' solo></v-text-field>
+										<v-text-field label='New Password' v-model='Client' solo></v-text-field>
 									</v-flex>
 								</v-layout>
 
@@ -135,21 +133,16 @@ export default {
 			user: {
 				name: 'Connor Lindsey',
 				role: 'Developer',
-				avatar: '/avatar-1.png',
-			},
-			title: '',
-			email: '',
-			originalPassword: '',
-			newPassword: '',
-			creditName: '',
-			CreditCard: '',
-			color: this.$vuetify.theme.primary
-		}
-	},
-	methods: {
-		setColor () {
-			this.$vuetify.theme.primary = this.color;
+				avatar: '/avatar-1.png'
+			}
 		}
 	}
 }
 </script>
+
+<style>
+/* #profile-card {
+	border: 1px solid #607D8B;
+	border-radius: 10%;
+} */
+</style>

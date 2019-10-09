@@ -80,15 +80,23 @@
 								@click:append="show1 = !show1"
 								required
 							></v-text-field>
+							<v-select
+								label='Role'
+								v-model='newUserRole'
+								:items='roles'
+								prepend-icon='work'
+								:menu-props="{
+									offsetY: '',
+									transition: 'slide-y-transition'
+								}"
+								required
+							></v-select>
 							<v-btn
 								block flat outline
 								class='primary'
 								@click='userSignUp'
 								:loading='loading'
 								>Submit</v-btn>
-							<div id="display_error" style="display:none">
-								Fix any errors in your sign in
-							</div>
 						</v-form>
 					</v-card-text>
 				</v-flex>
@@ -123,6 +131,7 @@ export default {
 			newUserEmail: '',
 			newUserPassword: '',
 			newUserName: '',
+			newUserRole: null,
 			settings: {
 				permissions: [],
 			}
@@ -131,60 +140,70 @@ export default {
 	computed: {
 		...mapState({
 			user: 'user',
+			groups: 'group',
 			projects: 'projects',
 		})
-	},
+  	},
 	methods: {
 		async userSignIn() {
-			this.loading = true;
-			const res = await login(this.userEmail, this.userPassword);
-			console.log('This is res');
-			console.log(res);
-			if(res != null){
+			//if (this.$refs.signIn.validate()) {
+				this.loading = true;
+				const res = await login(this.userEmail, this.userPassword);
+				res.returnGroups.forEach(group => {
+					this.$store.commit('createGroup', group);
+				});
+				res.returnProjects.forEach(project => {
+					this.$store.commit('createProject', project);
+				});				
 				this.$store.commit('signInUser', res);
-				console.log(this.user.groups)
 				this.getAllInfo();
-				console.log(this.user.groups);
+				setTimeout(() => {
 				this.loading = false;
 				this.$router.push('Dashboard');
-			}
-			else{
-				document.getElementById('display_error').style.display = 'block';
-				this.loading = false;
-			}
+			}, 1500);
+			//}
 		},
 		async userSignUp() {
 			//if (this.$refs.signIn.validate()) {
 				this.loading = true;
 				let groups = [];
 				let projects = [];
-				let timeclock = null;
-				let files = null;
 
-				const res = await register(this.newUserEmail, this.newUserPassword, this.settings, this.newUserName, groups, projects, timeclock, files);
+				const res = await register(this.newUserEmail, this.newUserPassword, this.settings, this.newUserName, groups, projects);
 				if(res){
 					const user = await login(this.newUserEmail, this.newUserPassword);
 					this.$store.commit('signInUser', user);
+					user.returnGroups.forEach(group => {
+						this.$store.commit('createGroup', group);
+					});
+					user.returnProjects.forEach(project => {
+						this.$store.commit('createProject', project);
+					});
 				}
 				this.getAllInfo();
+				setTimeout(() => {
 				this.loading = false;
 				this.$router.push('Dashboard');
+			}, 1500);
 			//}
 		},
 		async findProject(id) {
 			const project = await getProject(id);
+			console.log('project:', project);
 			this.$store.commit('createProject', project);
 		},
 		async findGroup(id) {
 			const group = await getGroup(id);
+			console.log('group:', group);
 			this.$store.commit('createGroup', group);
 		},
 		getAllInfo() {
+			console.log(this.user);
 			this.user.projects.forEach(id => {
-				this.findProject(id);
+			this.findProject(id);
 			});
 			this.user.groups.forEach(id => {
-				this.findGroup(id);
+			this.findGroup(id);
 			});
 		},
   },

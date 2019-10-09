@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # caddy-workflow
 
 ## Project setup
@@ -28,6 +27,3 @@ yarn run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
-=======
-# HadCAD
->>>>>>> fa5b887ad02598d3f5d9df7a02aac679c69ea384

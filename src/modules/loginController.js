@@ -1,57 +1,96 @@
-var firebase = require("firebase/app");
-require('firebase/auth');
+var baseUrl = 'https://414qofs2j8.execute-api.us-east-1.amazonaws.com/dev/';
 
 async function login(email, password) {
-  firebase.auth().signInWithEmailAndPassword(email, password).then(cred => {
-      document.getElementById('display_error').style.display = 'block';
-    }).then(() => {
-      let userRef = db.collection('users').doc(cred.user.id);
-      console.log('in then2')
-      userRef.get().then((doc) => {
-        return doc;
-      })
-  }).catch((err) => {
-    console.log('bad fetch');
-    //this.$refs.signUp.reset();
-    this.loading = false;
-    alert(err.message);
-  })
-}
-async function register(email, password, settings, name, groups, projects, type, status, timeclock, files)  {
-  let id = email;
-  firebase.auth().createUserWithEmailAndPassword(email, password).then(cred => {
-      db.collection('users').doc(cred.user.id).set({
-          id: id,
-          name: name,
-          groups: groups,
-          projects: projects,
-          files: files,
-          settings: settings,
-          timeclock: timeclock,
-          type: type,
-          status: status
-      }).then(() => {
-        console.log('here1')
-          let userRef = db.collection('users').doc(cred.user.id);
-          console.log('here2')
-          userRef.get().then((doc) => {
-            console.log('here3')
-              return doc
-          })
-      })
-  }).catch((err) => {
-    console.log('here4')
-      //this.$refs.signUp.reset();
-      this.loading = false;
-      alert(err.message);
-  })
-}
+        let returnError = 'go';
+        try{
+            const loginUser = { email, password }
+            const res = await fetch(`${baseUrl}users/auth`, {
+                  method: 'POST',
+                  body: JSON.stringify(loginUser)
+            }).then(function(response) {
+                    return response.json();
+                  }).then(function(data) {
+                    returnError = data.body.error;
+                  });
+            if(returnError != 'Not the correct password'){
+              try {
+                  let returnName = '';
+                  let returnEmail = '';
+                  let returnSettings = null;
+                  let returnGroups = [];
+                  let returnProjects = [];
+                  const res = await fetch(`${baseUrl}users/${email}`, {
+                    method: 'GET',
+                  }).then(function(response) {
+                    return response.json();
+                  }).then(function(data) {
+                    returnEmail = data.body.userId;
+                    returnName = data.body.name;
+                    returnSettings = data.body.settings;
+                    returnGroups = data.body.groups;
+                    returnProjects = data.body.projects;
+                  });
+                  return {returnName, returnEmail, returnSettings, returnGroups, returnProjects};
 
-async function updateUserGroup(userId, groupId){
-return userId, groupId
+                } catch (error) {
+                    return;
+                  }
+                }
+
+          }catch(error){
+                return;
+        }
+      }
+async function register(email, password, settings, name, groups, projects)  {
+  try {
+        const userId = email;
+        const newUser = { userId, name, groups, projects, settings, password }
+        const res = await fetch(`${baseUrl}users`, {
+            method: 'POST',
+            body: JSON.stringify(newUser)
+          })
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status} Error: ${res.statusText}`)
+          }
+          else{
+            return true;
+          }
+      } catch (error) {
+        return 'error';
+       }
 }
-async function updateUserProject(userId, projectId){
-return userId, projectId
+async function updateUser(user){
+  console.log('updainging user');
+  try{
+    console.log(user);
+    const userId = user.id
+    console.log(userId);
+    const res = await fetch(`${baseUrl}users/update/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify(user)
+    })
+    if(!res.ok){
+      throw new Error(`HTTP ${res.status} Error: ${res.statusText}`)
+    }
+
+  }catch(error){
+    return 'error';
+  }
+}
+async function updateUserGroup(userId, groupId){
+  console.log('updating group user');
+  try{
+    const res = await fetch(`${baseUrl}users/update/group/${userId}`, {
+      method: 'PUT',
+      body: JSON.stringify(groupId)
+    })
+    if(!res.ok){
+      throw new Error(`HTTP ${res.status} Error: ${res.statusText}`)
+    }
+
+  }catch(error){
+    return 'error';
+  }
 }
   
-export {login, register, updateUserGroup, updateUserProject};
+export {login, register, updateUser, updateUserGroup};
